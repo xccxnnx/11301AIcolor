@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人工智慧期末-色感重塑</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #ecdcc2;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #876D5A;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            color: #333;
+            margin-top: 30px;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            font-size: 1.1em;
+            color: #555;
+            margin-right: 10px;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            font-size: 1em;
+            color: #555;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        button {
+            background-color: #a98b73;
+            color: white;
+            padding: 15px 32px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #9a6852;
+        }
+
+        #result-image {
+            max-width: 100%;
+            border: 1px solid #e2e8f0;
+            margin-top: 20px;
+            border-radius: 8px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>色感重塑</h1>
+        
+        <!-- 用來上傳圖片的表單 -->
+        <form id="image-upload-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="image">選擇圖片：</label>
+            <input type="file" name="image" id="image" accept="image/*" required>
+            <br><br>
+            <button type="submit">上傳並處理圖片</button>
+        </form>
+
+        <h2>處理後的圖片</h2>
+        <img id="result-image" style="display:none; max-width: 100%;" />
+    </div>
+
+    <script>
+        // 設置表單的提交事件
+        document.getElementById('image-upload-form').onsubmit = async function(event) {
+            event.preventDefault();  // 防止表單默認提交
+
+            const formData = new FormData(this);  // 創建FormData對象，包含表單中的圖片
+
+            // 發送POST請求到/upload來處理圖片
+            const response = await fetch('/upload/', {
+                method: 'POST',
+                body: formData
+            });
+
+            // 如果請求成功
+            if (response.ok) {
+                const blob = await response.blob();  // 獲取返回的圖片數據
+                const url = URL.createObjectURL(blob);  // 創建一個圖片的URL
+
+                // 顯示處理後的圖片
+                const resultImage = document.getElementById('result-image');
+                resultImage.src = url;
+                resultImage.style.display = 'block';  // 顯示圖片
+            } else {
+                alert('圖片處理失敗，請重試！');
+            }
+        };
+    </script>
+</body>
+</html>
